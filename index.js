@@ -1,11 +1,14 @@
 const imageContainer = document.querySelector('#image-container')
 const loader = document.querySelector('#loader')
 
+let isImageReady = false
+let imagesLoaded = 0
+let totalImages = 0
 let photosArray = []
 
 // Unsplash API
 const count = 10
-const API_KEY = '52xbnRsxwa1i9WWTTW9u2f8MocvXBfK3nozA3ex29C4'
+const API_KEY = ''
 const apiUrl = `https://api.unsplash.com/photos/random/?client_id=${API_KEY}&count=${count}`
 
 function setAttributes(element, attributes) {
@@ -14,16 +17,28 @@ function setAttributes(element, attributes) {
 	}
 }
 
+function imageLoaded() {
+	imagesLoaded++
+	if (imagesLoaded === totalImages) {
+		isImageReady = true
+		console.log('ready =', isImageReady)
+	}
+}
+
 // Create elements for links & photos, add to the DOM
 function displayPhotos() {
+	imagesLoaded = 0
+	totalImages = photosArray.length
 	photosArray.forEach((photo) => {
-		// Create <a> tag
+		console.log('total images', totalImages)
+		// Create <a> tag with attributes
 		const item = document.createElement('a')
 		setAttributes(item, {
 			href: photo.links.html,
 			target: '_blank',
 		})
 
+		// Create <img> tag with attributes
 		const img = document.createElement('img')
 		setAttributes(img, {
 			src: photo.urls.regular,
@@ -31,6 +46,10 @@ function displayPhotos() {
 			title: photo.alt_description,
 		})
 
+		// Check when then images are finished loading
+		img.addEventListener('load', imageLoaded)
+
+		// Then append it to the parent
 		item.appendChild(img)
 		imageContainer.appendChild(item)
 	})
@@ -42,17 +61,20 @@ const getPhotos = async () => {
 		const response = await fetch(apiUrl)
 		photosArray = await response.json()
 		displayPhotos()
-	} catch (error) {}
+	} catch (error) {
+		console.log(error, "can't fetch photos")
+	}
 }
 
 // Scroll
 window.addEventListener('scroll', () => {
 	if (
-		window.innerHeight + window.scrollY >=
-		document.body.offsetHeight - 1000
+		window.innerHeight + window.scrollY >= document.body.offsetHeight - 2000 &&
+		isImageReady
 	) {
+		isImageReady = false
+
 		getPhotos()
-		console.log(window.scrollY)
 	}
 })
 
