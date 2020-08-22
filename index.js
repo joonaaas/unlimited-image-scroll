@@ -7,8 +7,8 @@ let totalImages = 0
 let photosArray = []
 
 // Unsplash API
-const count = 10
-const API_KEY = ''
+let count = 5
+const API_KEY = 'YOUR_API'
 const apiUrl = `https://api.unsplash.com/photos/random/?client_id=${API_KEY}&count=${count}`
 
 function setAttributes(element, attributes) {
@@ -20,8 +20,9 @@ function setAttributes(element, attributes) {
 function imageLoaded() {
 	imagesLoaded++
 	if (imagesLoaded === totalImages) {
+		loader.hidden = true
 		isImageReady = true
-		console.log('ready =', isImageReady)
+		count = 30
 	}
 }
 
@@ -73,7 +74,6 @@ window.addEventListener('scroll', () => {
 		isImageReady
 	) {
 		isImageReady = false
-
 		getPhotos()
 	}
 })
